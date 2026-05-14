@@ -14,8 +14,8 @@ jobs:
     name: Tactics Check (terraform fmt)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: actions/checkout@v6
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.5.0
       - name: terraform fmt -check -recursive
@@ -26,8 +26,8 @@ jobs:
     name: Formation Check (terraform validate)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
+      - uses: actions/checkout@v6
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.5.0
       - name: terraform init (no backend)
@@ -41,8 +41,8 @@ jobs:
     name: Medical Check (tflint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: actions/checkout@v6
+      - uses: terraform-linters/setup-tflint@v6
         with:
           tflint_version: latest
       - name: tflint --recursive
