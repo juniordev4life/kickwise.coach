@@ -65,46 +65,33 @@ resource "google_bigquery_dataset" "main" {
   }
 }
 
-# Phase 1 tables — created from DDL files in ../../sql/
-locals {
-  phase1_table_files = [
-    "001_create_seasons.sql",
-    "002_create_teams.sql",
-    "003_create_matches.sql",
-    "004_create_players.sql"
-  ]
+# Project-level permissions:
+# Dataset access alone doesn't grant bigquery.jobs.create, which the SDK
+# requires for any query/load/merge job. Grant the jobUser role on the
+# project to Scout (writes, MERGE), Playmaker (reads), and Engine (Phase 2
+# writes).
+resource "google_project_iam_member" "scout_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${var.scout_sa_email}"
 }
 
-resource "google_bigquery_job" "create_table" {
-  for_each = toset(local.phase1_table_files)
-
-  project  = var.project_id
-  location = var.region
-
-  job_id = "create_${replace(each.key, ".sql", "")}_${formatdate("YYYYMMDDhhmmss", timestamp())}"
-
-  query {
-    query = file("${path.module}/../../sql/${each.key}")
-
-    use_legacy_sql = false
-
-    destination_table {
-      project_id = var.project_id
-      dataset_id = google_bigquery_dataset.main.dataset_id
-      # table_id is implicit from the DDL CREATE TABLE statement
-      table_id = replace(replace(each.key, "^00[0-9]_create_", ""), ".sql", "")
-    }
-
-    write_disposition  = "WRITE_EMPTY"
-    create_disposition = "CREATE_IF_NEEDED"
-  }
-
-  # Re-running this with create_disposition=CREATE_IF_NEEDED means
-  # an existing table won't be replaced — keeps Terraform idempotent.
-  lifecycle {
-    ignore_changes = [job_id, query[0].destination_table]
-  }
+resource "google_project_iam_member" "playmaker_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${var.playmaker_sa_email}"
 }
+
+resource "google_project_iam_member" "engine_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${var.engine_sa_email}"
+}
+
+# Phase 1 tables are created from the DDL files under terraform/sql/ by the
+# Coach README bootstrap step (bq query). Phase 2+ tables follow the same
+# pattern. We don't manage them with google_bigquery_table here because the
+# DDL files already capture the partition + cluster setup we want.
 
 output "dataset_id" {
   value = google_bigquery_dataset.main.dataset_id
