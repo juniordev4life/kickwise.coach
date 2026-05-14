@@ -28,8 +28,10 @@ module "secrets" {
 module "firestore" {
   source = "./modules/firestore"
 
-  project_id = var.project_id
-  region     = var.region
+  project_id         = var.project_id
+  region             = var.region
+  playmaker_sa_email = module.service_accounts.playmaker_sa_email
+  engine_sa_email    = module.service_accounts.engine_sa_email
 }
 
 module "bigquery" {
