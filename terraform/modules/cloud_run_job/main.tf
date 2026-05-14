@@ -28,9 +28,10 @@ variable "labels" {
 }
 
 resource "google_cloud_run_v2_job" "scout" {
-  name     = "${var.resource_prefix}-job-scout"
-  project  = var.project_id
-  location = var.region
+  name                = "${var.resource_prefix}-job-scout"
+  project             = var.project_id
+  location            = var.region
+  deletion_protection = false
 
   template {
     template {

@@ -37,10 +37,11 @@ variable "labels" {
 
 # Winger — internal-only, called by Playmaker via service-to-service auth
 resource "google_cloud_run_v2_service" "winger" {
-  name     = "${var.resource_prefix}-run-winger"
-  project  = var.project_id
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  name                = "${var.resource_prefix}-run-winger"
+  project             = var.project_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  deletion_protection = false
 
   template {
     service_account = var.winger_sa_email
@@ -80,10 +81,11 @@ resource "google_cloud_run_v2_service" "winger" {
 
 # Playmaker — public, but currently behind LB. Allow public for now to keep the LB simple.
 resource "google_cloud_run_v2_service" "playmaker" {
-  name     = "${var.resource_prefix}-run-playmaker"
-  project  = var.project_id
-  location = var.region
-  ingress  = "INGRESS_TRAFFIC_ALL"
+  name                = "${var.resource_prefix}-run-playmaker"
+  project             = var.project_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
 
   template {
     service_account = var.playmaker_sa_email
