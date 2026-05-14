@@ -27,3 +27,13 @@ output "workload_identity_provider" {
   description = "Workload Identity Provider resource name for GitHub Actions OIDC."
   value       = module.workload_identity.provider_name
 }
+
+output "artifact_registry_url" {
+  description = "Base URL for Kickwise container images, e.g. europe-west3-docker.pkg.dev/kickwise-prod/kickwise."
+  value       = module.artifact_registry.repository_url
+}
+
+output "github_deploy_sa_email" {
+  description = "Service account used by GitHub Actions to push images and deploy."
+  value       = module.workload_identity.github_deploy_sa_email
+}

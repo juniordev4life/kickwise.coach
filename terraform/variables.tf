@@ -34,21 +34,26 @@ variable "bigquery_dataset_id" {
 }
 
 variable "playmaker_image" {
-  description = "Container image (incl. tag) for the Playmaker Cloud Run service."
+  description = <<-EOT
+    Container image (incl. tag) for the Playmaker Cloud Run service.
+    Default is the public gcr.io/cloudrun/hello placeholder so the first
+    `terraform apply` succeeds. Override once you've pushed a real image:
+      europe-west3-docker.pkg.dev/kickwise-prod/kickwise/playmaker:<tag>
+  EOT
   type        = string
-  default     = "europe-west3-docker.pkg.dev/kickwise-prod/kickwise/playmaker:latest"
+  default     = "gcr.io/cloudrun/hello"
 }
 
 variable "winger_image" {
   description = "Container image (incl. tag) for the Winger Cloud Run service."
   type        = string
-  default     = "europe-west3-docker.pkg.dev/kickwise-prod/kickwise/winger:latest"
+  default     = "gcr.io/cloudrun/hello"
 }
 
 variable "scout_image" {
   description = "Container image (incl. tag) for the Scout Cloud Run Job."
   type        = string
-  default     = "europe-west3-docker.pkg.dev/kickwise-prod/kickwise/scout:latest"
+  default     = "gcr.io/cloudrun/hello"
 }
 
 variable "scout_schedule_cron" {

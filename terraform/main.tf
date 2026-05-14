@@ -118,3 +118,17 @@ module "workload_identity" {
   resource_prefix   = local.resource_prefix
   github_repo_owner = var.github_repo_owner
 }
+
+module "artifact_registry" {
+  source = "./modules/artifact_registry"
+
+  project_id             = var.project_id
+  region                 = var.region
+  resource_prefix        = local.resource_prefix
+  playmaker_sa_email     = module.service_accounts.playmaker_sa_email
+  winger_sa_email        = module.service_accounts.winger_sa_email
+  scout_sa_email         = module.service_accounts.scout_sa_email
+  engine_sa_email        = module.service_accounts.engine_sa_email
+  github_deploy_sa_email = module.workload_identity.github_deploy_sa_email
+  labels                 = local.common_labels
+}
