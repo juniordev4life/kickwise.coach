@@ -16,6 +16,11 @@ variable "engine_sa_email" {
   default = ""
 }
 
+variable "scout_sa_email" {
+  type    = string
+  default = ""
+}
+
 resource "google_firestore_database" "default" {
   project                     = var.project_id
   name                        = "(default)"
@@ -42,6 +47,17 @@ resource "google_project_iam_member" "engine_firestore_user" {
   project = var.project_id
   role    = "roles/datastore.user"
   member  = "serviceAccount:${var.engine_sa_email}"
+
+  depends_on = [google_firestore_database.default]
+}
+
+# Scout needs to (a) read the active Kickbase token from users/{uid}.kbToken
+# and (b) write daily player snapshots to players/{playerId}.
+resource "google_project_iam_member" "scout_firestore_user" {
+  count   = var.scout_sa_email != "" ? 1 : 0
+  project = var.project_id
+  role    = "roles/datastore.user"
+  member  = "serviceAccount:${var.scout_sa_email}"
 
   depends_on = [google_firestore_database.default]
 }

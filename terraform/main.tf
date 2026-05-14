@@ -32,6 +32,7 @@ module "firestore" {
   region             = var.region
   playmaker_sa_email = module.service_accounts.playmaker_sa_email
   engine_sa_email    = module.service_accounts.engine_sa_email
+  scout_sa_email     = module.service_accounts.scout_sa_email
 }
 
 module "bigquery" {
