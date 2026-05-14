@@ -76,14 +76,38 @@ else
     --project="${PROJECT_ID}"
 fi
 
+echo "==> Warte bis SA in der IAM-API sichtbar wird (eventually consistent)"
+for attempt in 1 2 3 4 5 6 7 8 9 10; do
+  if gcloud iam service-accounts describe "${BOOTSTRAP_SA_EMAIL}" \
+       --project="${PROJECT_ID}" >/dev/null 2>&1; then
+    echo "    SA gefunden nach Versuch ${attempt}"
+    break
+  fi
+  echo "    SA noch nicht sichtbar (Versuch ${attempt}), warte 3s …"
+  sleep 3
+done
+
 echo "==> Rollen an Bootstrap-SA vergeben"
 for role in roles/editor roles/iam.securityAdmin roles/storage.admin roles/resourcemanager.projectIamAdmin; do
-  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
-    --member="serviceAccount:${BOOTSTRAP_SA_EMAIL}" \
-    --role="${role}" \
-    --condition=None \
-    --quiet
+  echo "    -> ${role}"
+  for attempt in 1 2 3 4 5; do
+    if gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+         --member="serviceAccount:${BOOTSTRAP_SA_EMAIL}" \
+         --role="${role}" \
+         --condition=None \
+         --quiet 2>/tmp/iam_err; then
+      break
+    fi
+    if grep -q "does not exist" /tmp/iam_err && [ "${attempt}" -lt 5 ]; then
+      echo "       SA noch nicht propagiert, warte 5s und retry (${attempt}/5)"
+      sleep 5
+      continue
+    fi
+    cat /tmp/iam_err
+    exit 1
+  done
 done
+rm -f /tmp/iam_err
 
 echo "==> SA-Key generieren: ${KEY_PATH}"
 mkdir -p "$(dirname "${KEY_PATH}")"
