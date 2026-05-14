@@ -73,6 +73,15 @@ resource "google_cloud_run_v2_job" "scout" {
   }
 
   labels = var.labels
+
+  # Image is rotated by the Scout Match Day workflow.
+  lifecycle {
+    ignore_changes = [
+      template[0].template[0].containers[0].image,
+      client,
+      client_version
+    ]
+  }
 }
 
 output "scout_job_name" {

@@ -86,6 +86,16 @@ resource "google_cloud_run_v2_service" "winger" {
   }
 
   labels = var.labels
+
+  # Image is rotated by the Winger Match Day workflow. Terraform should not
+  # fight CD by reverting to the default image on every apply.
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      client,
+      client_version
+    ]
+  }
 }
 
 # Playmaker — public, but currently behind LB. Allow public for now to keep the LB simple.
@@ -150,6 +160,15 @@ resource "google_cloud_run_v2_service" "playmaker" {
   }
 
   labels = var.labels
+
+  # Image is rotated by the Playmaker Match Day workflow.
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      client,
+      client_version
+    ]
+  }
 }
 
 # Allow Playmaker SA to invoke the Winger Cloud Run service
@@ -202,6 +221,15 @@ resource "google_cloud_run_v2_service" "striker" {
   }
 
   labels = var.labels
+
+  # Image is rotated by the Striker Match Day workflow.
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      client,
+      client_version
+    ]
+  }
 }
 
 resource "google_cloud_run_v2_service_iam_member" "striker_public_invoke" {
