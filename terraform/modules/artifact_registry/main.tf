@@ -26,6 +26,11 @@ variable "engine_sa_email" {
   type = string
 }
 
+variable "striker_sa_email" {
+  type    = string
+  default = ""
+}
+
 variable "github_deploy_sa_email" {
   type    = string
   default = ""
@@ -67,7 +72,8 @@ locals {
     "serviceAccount:${var.playmaker_sa_email}",
     "serviceAccount:${var.winger_sa_email}",
     "serviceAccount:${var.scout_sa_email}",
-    "serviceAccount:${var.engine_sa_email}"
+    "serviceAccount:${var.engine_sa_email}",
+    var.striker_sa_email != "" ? "serviceAccount:${var.striker_sa_email}" : ""
   ])
 
   pushers = compact([

@@ -56,6 +56,12 @@ variable "scout_image" {
   default     = "gcr.io/cloudrun/hello"
 }
 
+variable "striker_image" {
+  description = "Container image (incl. tag) for the Striker Cloud Run service."
+  type        = string
+  default     = "gcr.io/cloudrun/hello"
+}
+
 variable "scout_schedule_cron" {
   description = "Cloud Scheduler cron expression for the daily Scout run."
   type        = string

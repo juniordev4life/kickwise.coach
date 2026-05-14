@@ -8,14 +8,16 @@ output "winger_service_url" {
   value       = module.cloud_run.winger_service_url
 }
 
-output "striker_bucket_name" {
-  description = "Cloud Storage bucket hosting the Striker static files."
-  value       = module.storage.striker_bucket_name
+output "striker_service_url" {
+  description = "Direct Cloud Run URL of the Striker SPA (nginx + SPA fallback)."
+  value       = module.cloud_run.striker_service_url
 }
 
-output "striker_public_url" {
-  description = "Direct Cloud Storage public URL for the Striker SPA (no Load Balancer in Phase 1)."
-  value       = "https://storage.googleapis.com/${module.storage.striker_bucket_name}/index.html"
+# Storage bucket is kept around in case we want to revisit static hosting
+# under a custom domain later, but the SPA is no longer served from it.
+output "striker_bucket_name" {
+  description = "Cloud Storage bucket — currently unused for hosting (SPA is on Cloud Run)."
+  value       = module.storage.striker_bucket_name
 }
 
 output "bigquery_dataset_id" {

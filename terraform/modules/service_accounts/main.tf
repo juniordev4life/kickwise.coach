@@ -36,6 +36,12 @@ resource "google_service_account" "engine" {
   project      = var.project_id
 }
 
+resource "google_service_account" "striker" {
+  account_id   = "${var.resource_prefix}-sa-striker"
+  display_name = "Kickwise Striker"
+  project      = var.project_id
+}
+
 output "playmaker_sa_email" {
   value = google_service_account.playmaker.email
 }
@@ -54,4 +60,8 @@ output "scheduler_sa_email" {
 
 output "engine_sa_email" {
   value = google_service_account.engine.email
+}
+
+output "striker_sa_email" {
+  value = google_service_account.striker.email
 }

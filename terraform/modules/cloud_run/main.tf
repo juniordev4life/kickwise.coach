@@ -18,11 +18,20 @@ variable "winger_image" {
   type = string
 }
 
+variable "striker_image" {
+  type    = string
+  default = "gcr.io/cloudrun/hello"
+}
+
 variable "playmaker_sa_email" {
   type = string
 }
 
 variable "winger_sa_email" {
+  type = string
+}
+
+variable "striker_sa_email" {
   type = string
 }
 
@@ -161,6 +170,48 @@ resource "google_cloud_run_v2_service_iam_member" "playmaker_public_invoke" {
   member   = "allUsers"
 }
 
+# Striker — public static SPA hosting via nginx with SPA fallback.
+resource "google_cloud_run_v2_service" "striker" {
+  name                = "${var.resource_prefix}-run-striker"
+  project             = var.project_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
+
+  template {
+    service_account = var.striker_sa_email
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 5
+    }
+
+    containers {
+      image = var.striker_image
+
+      ports {
+        container_port = 8080
+      }
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "256Mi"
+        }
+      }
+    }
+  }
+
+  labels = var.labels
+}
+
+resource "google_cloud_run_v2_service_iam_member" "striker_public_invoke" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.striker.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
 output "playmaker_service_name" {
   value = google_cloud_run_v2_service.playmaker.name
 }
@@ -175,4 +226,12 @@ output "winger_service_name" {
 
 output "winger_service_url" {
   value = google_cloud_run_v2_service.winger.uri
+}
+
+output "striker_service_name" {
+  value = google_cloud_run_v2_service.striker.name
+}
+
+output "striker_service_url" {
+  value = google_cloud_run_v2_service.striker.uri
 }
