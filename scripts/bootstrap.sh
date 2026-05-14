@@ -34,6 +34,7 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   storage.googleapis.com \
   serviceusage.googleapis.com \
+  cloudresourcemanager.googleapis.com \
   --project="${PROJECT_ID}"
 
 echo "==> Terraform-State-Bucket erstellen: gs://${TF_STATE_BUCKET}"
@@ -88,7 +89,19 @@ for attempt in 1 2 3 4 5 6 7 8 9 10; do
 done
 
 echo "==> Rollen an Bootstrap-SA vergeben"
-for role in roles/editor roles/iam.securityAdmin roles/storage.admin roles/resourcemanager.projectIamAdmin; do
+# roles/editor                          — basic create/update across most GCP services
+# roles/iam.securityAdmin               — add/remove IAM bindings on the project
+# roles/iam.workloadIdentityPoolAdmin   — create/manage Workload Identity Pools + Providers
+# roles/storage.admin                   — manage GCS buckets (tf state + striker bucket)
+# roles/resourcemanager.projectIamAdmin — manage project-level IAM policies
+# roles/datastore.owner                 — create/manage Firestore (default) database
+for role in \
+  roles/editor \
+  roles/iam.securityAdmin \
+  roles/iam.workloadIdentityPoolAdmin \
+  roles/storage.admin \
+  roles/resourcemanager.projectIamAdmin \
+  roles/datastore.owner; do
   echo "    -> ${role}"
   for attempt in 1 2 3 4 5; do
     if gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
