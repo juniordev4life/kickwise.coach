@@ -62,16 +62,22 @@ module "cloud_run" {
   resource_prefix    = local.resource_prefix
   playmaker_image    = var.playmaker_image
   winger_image       = var.winger_image
-  striker_image      = var.striker_image
   playmaker_sa_email = module.service_accounts.playmaker_sa_email
   winger_sa_email    = module.service_accounts.winger_sa_email
-  striker_sa_email   = module.service_accounts.striker_sa_email
   jwt_secret_id      = module.secrets.jwt_secret_id
   labels             = local.common_labels
 
   # secrets must be applied first so that the JWT secret has a version
   # available before the Playmaker service tries to bind to it.
   depends_on = [module.firestore, module.bigquery, module.secrets]
+}
+
+module "firebase_hosting" {
+  source = "./modules/firebase_hosting"
+
+  project_id             = var.project_id
+  site_id                = "${var.app_short}-striker"
+  github_deploy_sa_email = module.workload_identity.github_deploy_sa_email
 }
 
 module "cloud_run_job" {
@@ -139,7 +145,6 @@ module "artifact_registry" {
   winger_sa_email        = module.service_accounts.winger_sa_email
   scout_sa_email         = module.service_accounts.scout_sa_email
   engine_sa_email        = module.service_accounts.engine_sa_email
-  striker_sa_email       = module.service_accounts.striker_sa_email
   github_deploy_sa_email = module.workload_identity.github_deploy_sa_email
   labels                 = local.common_labels
 }

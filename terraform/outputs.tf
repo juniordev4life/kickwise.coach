@@ -8,15 +8,20 @@ output "winger_service_url" {
   value       = module.cloud_run.winger_service_url
 }
 
-output "striker_service_url" {
-  description = "Direct Cloud Run URL of the Striker SPA (nginx + SPA fallback)."
-  value       = module.cloud_run.striker_service_url
+output "striker_url" {
+  description = "Public URL of the Striker SPA on Firebase Hosting."
+  value       = module.firebase_hosting.default_url
 }
 
-# Storage bucket is kept around in case we want to revisit static hosting
-# under a custom domain later, but the SPA is no longer served from it.
+output "firebase_hosting_site_id" {
+  description = "Firebase Hosting site id (used as <site>.web.app subdomain)."
+  value       = module.firebase_hosting.site_id
+}
+
+# Storage bucket is kept around in case we want to revisit alternative static
+# hosting later (e.g. Cloud Storage Website Mode + custom domain).
 output "striker_bucket_name" {
-  description = "Cloud Storage bucket — currently unused for hosting (SPA is on Cloud Run)."
+  description = "Cloud Storage bucket — currently unused (SPA is on Firebase Hosting)."
   value       = module.storage.striker_bucket_name
 }
 
