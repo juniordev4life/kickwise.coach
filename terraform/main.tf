@@ -98,18 +98,24 @@ module "cloud_scheduler" {
   depends_on = [module.cloud_run_job]
 }
 
-module "load_balancer" {
-  source = "./modules/load_balancer"
-
-  project_id             = var.project_id
-  region                 = var.region
-  resource_prefix        = local.resource_prefix
-  striker_bucket_name    = module.storage.striker_bucket_name
-  playmaker_service_name = module.cloud_run.playmaker_service_name
-  labels                 = local.common_labels
-
-  depends_on = [module.cloud_run, module.storage]
-}
+# Phase-1: HTTPS Load Balancer ist bewusst auskommentiert, um den Fixpreis
+# (~18 €/Monat für die globale IP) zu sparen. Wir greifen direkt auf die
+# default *.run.app-URLs und die Cloud-Storage-Public-URL des Striker-Buckets
+# zurück. Sobald wir eine Custom-Domain anhängen wollen, wird dieses Modul
+# wieder aktiviert.
+#
+# module "load_balancer" {
+#   source = "./modules/load_balancer"
+#
+#   project_id             = var.project_id
+#   region                 = var.region
+#   resource_prefix        = local.resource_prefix
+#   striker_bucket_name    = module.storage.striker_bucket_name
+#   playmaker_service_name = module.cloud_run.playmaker_service_name
+#   labels                 = local.common_labels
+#
+#   depends_on = [module.cloud_run, module.storage]
+# }
 
 module "workload_identity" {
   source = "./modules/workload_identity"

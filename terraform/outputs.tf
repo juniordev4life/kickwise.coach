@@ -13,9 +13,9 @@ output "striker_bucket_name" {
   value       = module.storage.striker_bucket_name
 }
 
-output "load_balancer_ip" {
-  description = "Public IP of the global HTTPS load balancer."
-  value       = module.load_balancer.load_balancer_ip
+output "striker_public_url" {
+  description = "Direct Cloud Storage public URL for the Striker SPA (no Load Balancer in Phase 1)."
+  value       = "https://storage.googleapis.com/${module.storage.striker_bucket_name}/index.html"
 }
 
 output "bigquery_dataset_id" {
