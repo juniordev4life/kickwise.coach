@@ -67,7 +67,9 @@ module "cloud_run" {
   jwt_secret_id      = module.secrets.jwt_secret_id
   labels             = local.common_labels
 
-  depends_on = [module.firestore, module.bigquery]
+  # secrets must be applied first so that the JWT secret has a version
+  # available before the Playmaker service tries to bind to it.
+  depends_on = [module.firestore, module.bigquery, module.secrets]
 }
 
 module "cloud_run_job" {

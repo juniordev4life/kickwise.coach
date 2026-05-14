@@ -29,9 +29,27 @@ resource "google_secret_manager_secret" "jwt_secret" {
   }
 }
 
-# Initial empty version — must be filled manually via:
-#   echo -n "<random-256-bit-secret>" | gcloud secrets versions add ... --data-file=-
-# Terraform doesn't manage the version content.
+# Cloud Run reads `:latest` at service-create time, so we must seed the secret
+# with at least one version. We generate a 64-char random value and write it
+# as the initial version. The user can rotate later with:
+#   gcloud secrets versions add kickwise-euw3-secret-jwt --data-file=-
+# `ignore_changes` keeps Terraform from rotating it on every apply.
+resource "random_password" "jwt_secret_initial" {
+  length      = 64
+  special     = false
+  min_lower   = 16
+  min_upper   = 16
+  min_numeric = 16
+}
+
+resource "google_secret_manager_secret_version" "jwt_secret_initial" {
+  secret      = google_secret_manager_secret.jwt_secret.id
+  secret_data = random_password.jwt_secret_initial.result
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
+}
 
 resource "google_secret_manager_secret_iam_member" "playmaker_jwt_access" {
   project   = var.project_id
