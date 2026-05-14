@@ -1,0 +1,16 @@
+-- PHASE 4: 3-2-1-Wettkampfpunkte pro Manager/Spieltag.
+
+-- CREATE TABLE IF NOT EXISTS `kickwise-prod.kickwise_main.manager_h2h_results` (
+--   league_id          STRING    NOT NULL,
+--   season_id          STRING    NOT NULL,
+--   matchday           INT64     NOT NULL,
+--   kickbase_user_id   STRING    NOT NULL,
+--   matchday_points    INT64,
+--   h2h_rank           INT64     OPTIONS(description="1, 2, 3, ... — Position der erreichten Punkte am Spieltag"),
+--   h2h_points         INT64     OPTIONS(description="3 / 2 / 1 / 0 nach Rang"),
+--   computed_at        TIMESTAMP
+-- )
+-- CLUSTER BY league_id, kickbase_user_id
+-- OPTIONS (
+--   description = "Liga-interner Wettkampfstand nach dem 3-2-1-System."
+-- );

@@ -1,0 +1,29 @@
+-- PHASE 2: per-Spiel-Statistiken pro Spieler, multi-source.
+-- Datei wird in Phase 2 von _stub_005_*.sql zu 005_*.sql umbenannt und Terraform liest sie ein.
+
+-- CREATE TABLE IF NOT EXISTS `kickwise-prod.kickwise_main.player_match_stats` (
+--   match_id           STRING    NOT NULL,
+--   player_id          STRING    NOT NULL,
+--   team_id            STRING    NOT NULL,
+--   season_id          STRING    NOT NULL,
+--   minutes_played     INT64,
+--   goals              INT64,
+--   assists            INT64,
+--   shots              INT64,
+--   shots_on_target    INT64,
+--   xg                 FLOAT64,
+--   xa                 FLOAT64,
+--   key_passes         INT64,
+--   big_chances_created INT64,
+--   yellow_cards       INT64,
+--   red_cards          INT64,
+--   kickbase_points    INT64,
+--   source             STRING    OPTIONS(description="'openligadb' | 'understat' | 'fbref' | 'kickbase'"),
+--   match_kickoff_at   TIMESTAMP,
+--   last_synced_at     TIMESTAMP
+-- )
+-- PARTITION BY DATE(match_kickoff_at)
+-- CLUSTER BY player_id, season_id
+-- OPTIONS (
+--   description = "Spieler-Statistiken pro Match, mehrere Quellen kombiniert. Geführt von Scout + Winger."
+-- );

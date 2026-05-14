@@ -1,0 +1,17 @@
+-- PHASE 3: Spieler-Punkt-Projektionen für Captain-Picker.
+
+-- CREATE TABLE IF NOT EXISTS `kickwise-prod.kickwise_main.player_projections` (
+--   match_id                    STRING    NOT NULL,
+--   player_id                   STRING    NOT NULL,
+--   model_version               STRING    NOT NULL,
+--   run_at                      TIMESTAMP NOT NULL,
+--   prob_starts                 FLOAT64,
+--   projected_minutes           FLOAT64,
+--   projected_kickbase_points   FLOAT64,
+--   features                    JSON
+-- )
+-- PARTITION BY DATE(run_at)
+-- CLUSTER BY player_id
+-- OPTIONS (
+--   description = "Erwartete Spieler-Kickbase-Punkte pro Match. Input für Captain-Picker."
+-- );

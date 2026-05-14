@@ -1,0 +1,6 @@
+project_id        = "kickwise-prod"
+region            = "europe-west3"
+region_code       = "euw3"
+app_short         = "kickwise"
+environment       = "prod"
+github_repo_owner = "juniordev4life"

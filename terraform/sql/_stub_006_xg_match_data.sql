@@ -1,0 +1,18 @@
+-- PHASE 2: Team-Level xG je Match (für Poisson-Modell).
+-- Wird in Phase 2 zu 006_*.sql umbenannt.
+
+-- CREATE TABLE IF NOT EXISTS `kickwise-prod.kickwise_main.xg_match_data` (
+--   match_id        STRING    NOT NULL,
+--   team_id         STRING    NOT NULL,
+--   season_id       STRING    NOT NULL,
+--   xg              FLOAT64,
+--   xga             FLOAT64,
+--   deep_passes     INT64,
+--   ppda            FLOAT64,
+--   source          STRING    OPTIONS(description="'understat' | 'fbref'"),
+--   last_synced_at  TIMESTAMP
+-- )
+-- CLUSTER BY team_id, season_id
+-- OPTIONS (
+--   description = "Team-Level xG-Daten pro Bundesliga-Match. Input für Poisson-Predictions."
+-- );
