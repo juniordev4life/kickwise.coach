@@ -69,11 +69,6 @@ resource "google_cloud_run_v2_service" "winger" {
       }
 
       env {
-        name  = "PORT"
-        value = "8080"
-      }
-
-      env {
         name  = "KICKBASE_BASE_URL"
         value = "https://api.kickbase.com"
       }
@@ -114,11 +109,6 @@ resource "google_cloud_run_v2_service" "playmaker" {
       env {
         name  = "NODE_ENV"
         value = "production"
-      }
-
-      env {
-        name  = "PORT"
-        value = "8080"
       }
 
       env {
