@@ -105,6 +105,7 @@ module "cloud_scheduler" {
   resource_prefix     = local.resource_prefix
   scout_job_name      = module.cloud_run_job.scout_job_name
   scheduler_sa_email  = module.service_accounts.scheduler_sa_email
+  scout_sa_email      = module.service_accounts.scout_sa_email
   scout_schedule_cron = var.scout_schedule_cron
   scout_schedule_tz   = var.scout_schedule_timezone
 

@@ -36,10 +36,26 @@ variable "player_snapshot_tz" {
   default = "Europe/Berlin"
 }
 
+variable "scout_sa_email" {
+  type        = string
+  description = "Scout runtime SA — needed for serviceAccountUser on the scheduler."
+  default     = ""
+}
+
+# Cloud Run v2 Jobs:run requires run.jobs.run which `roles/run.invoker`
+# (services-only) does not include — use roles/run.developer.
 resource "google_project_iam_member" "scheduler_can_invoke_jobs" {
   project = var.project_id
-  role    = "roles/run.invoker"
+  role    = "roles/run.developer"
   member  = "serviceAccount:${var.scheduler_sa_email}"
+}
+
+# Scheduler also needs to act as the Scout runtime SA to launch the job.
+resource "google_service_account_iam_member" "scheduler_acts_as_scout" {
+  count              = var.scout_sa_email != "" ? 1 : 0
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.scout_sa_email}"
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${var.scheduler_sa_email}"
 }
 
 # Daily openligadb sync (matches, teams, seasons). Default 06:00 Berlin.
