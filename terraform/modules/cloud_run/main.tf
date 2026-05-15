@@ -18,6 +18,10 @@ variable "winger_image" {
   type = string
 }
 
+variable "engine_image" {
+  type = string
+}
+
 variable "playmaker_sa_email" {
   type = string
 }
@@ -26,8 +30,17 @@ variable "winger_sa_email" {
   type = string
 }
 
+variable "engine_sa_email" {
+  type = string
+}
+
 variable "jwt_secret_id" {
   type = string
+}
+
+variable "dataset_id" {
+  type    = string
+  default = "kickwise_main"
 }
 
 variable "labels" {
@@ -141,7 +154,12 @@ resource "google_cloud_run_v2_service" "playmaker" {
 
       env {
         name  = "BQ_DATASET"
-        value = "kickwise_main"
+        value = var.dataset_id
+      }
+
+      env {
+        name  = "ENGINE_URL"
+        value = google_cloud_run_v2_service.engine.uri
       }
 
       env {
@@ -159,6 +177,66 @@ resource "google_cloud_run_v2_service" "playmaker" {
   labels = var.labels
 
   # Image is rotated by the Playmaker Match Day workflow.
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+      client,
+      client_version
+    ]
+  }
+}
+
+# Engine — Phase 2 prediction service. Public ingress for now; Playmaker
+# reaches it without OIDC. The service has no user data of its own (it just
+# reads BigQuery), so the same trade-off as Winger applies: tighten with
+# ID-token + INTERNAL_ONLY once Phase 2 work justifies it.
+resource "google_cloud_run_v2_service" "engine" {
+  name                = "${var.resource_prefix}-run-engine"
+  project             = var.project_id
+  location            = var.region
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
+
+  template {
+    service_account = var.engine_sa_email
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 3
+    }
+
+    containers {
+      image = var.engine_image
+
+      ports {
+        container_port = 8080
+      }
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "512Mi"
+        }
+      }
+
+      env {
+        name  = "NODE_ENV"
+        value = "production"
+      }
+
+      env {
+        name  = "BQ_PROJECT_ID"
+        value = var.project_id
+      }
+
+      env {
+        name  = "BQ_DATASET"
+        value = var.dataset_id
+      }
+    }
+  }
+
+  labels = var.labels
+
   lifecycle {
     ignore_changes = [
       template[0].containers[0].image,
@@ -199,6 +277,24 @@ resource "google_cloud_run_v2_service_iam_member" "playmaker_public_invoke" {
   member   = "allUsers"
 }
 
+# Playmaker SA invokes Engine.
+resource "google_cloud_run_v2_service_iam_member" "playmaker_invokes_engine" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.engine.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${var.playmaker_sa_email}"
+}
+
+# Phase 2: public invoke on Engine, same trade-off as Winger.
+resource "google_cloud_run_v2_service_iam_member" "engine_public_invoke" {
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.engine.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
 output "playmaker_service_name" {
   value = google_cloud_run_v2_service.playmaker.name
 }
@@ -213,4 +309,12 @@ output "winger_service_name" {
 
 output "winger_service_url" {
   value = google_cloud_run_v2_service.winger.uri
+}
+
+output "engine_service_name" {
+  value = google_cloud_run_v2_service.engine.name
+}
+
+output "engine_service_url" {
+  value = google_cloud_run_v2_service.engine.uri
 }
