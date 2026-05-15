@@ -111,8 +111,9 @@ module "cloud_scheduler" {
   scout_sa_email      = module.service_accounts.scout_sa_email
   scout_schedule_cron = var.scout_schedule_cron
   scout_schedule_tz   = var.scout_schedule_timezone
+  engine_service_url  = module.cloud_run.engine_service_url
 
-  depends_on = [module.cloud_run_job]
+  depends_on = [module.cloud_run_job, module.cloud_run]
 }
 
 # Phase-1: HTTPS Load Balancer ist bewusst auskommentiert, um den Fixpreis
