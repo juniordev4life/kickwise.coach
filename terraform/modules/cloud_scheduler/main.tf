@@ -160,6 +160,11 @@ resource "google_cloud_scheduler_job" "engine_refresh_current" {
     headers = {
       "Content-Type" = "application/json"
     }
+
+    # Fastify rejects an empty request body when Content-Type is
+    # application/json with 400 INVALID_ARGUMENT. Send a minimal `{}`
+    # so the scheduler hits a valid body parser path.
+    body = base64encode("{}")
   }
 
   retry_config {
